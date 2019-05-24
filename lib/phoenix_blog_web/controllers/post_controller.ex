@@ -1,8 +1,24 @@
 defmodule PhoenixBlogWeb.PostController do
   use PhoenixBlogWeb, :controller
 
+  alias PhoenixBlog.Repo
   alias PhoenixBlog.Content
   alias PhoenixBlog.Content.Post
+  alias PhoenixBlog.Content.Comment
+
+  plug :scrub_params, "comment" when action in [:add_comment]
+
+  def add_comment(conn, %{"comment" => comment_params, "post_id" => post_id}) do
+    post = Post
+           |> Repo.get!(post_id)
+           |> Repo.preload([:comments])
+    comment = Ecto.build_assoc(post, :comments, content: comment_params["content"], name: comment_params["name"])
+    Repo.insert!(comment)
+
+    conn
+    |> put_flash(:info, "Comment added.")
+    |> redirect(to: Routes.post_path(conn, :show, post))
+  end
 
   def index(conn, _params) do
     posts = Content.list_posts()
@@ -28,7 +44,9 @@ defmodule PhoenixBlogWeb.PostController do
 
   def show(conn, %{"id" => id}) do
     post = Content.get_post!(id)
-    render(conn, "show.html", post: post)
+           |> Repo.preload([:comments])
+    changeset = Comment.changeset(%Comment{}, %{"name" => "Nazwa użytkownika", "content" => "Treść komentarza"})
+    render(conn, "show.html", post: post, changeset: changeset)
   end
 
   def edit(conn, %{"id" => id}) do

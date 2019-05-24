@@ -14,5 +14,9 @@
 
 </ul>
 
+<%= render "comment_form.html", post: @post, changeset: @changeset,
+action: Routes.post_post_path(@conn, :add_comment, @post) %>
+<%= render "comments.html", post: @post %>
+
 <span><%= link "Edit", to: Routes.post_path(@conn, :edit, @post) %></span>
 <span><%= link "Back", to: Routes.post_path(@conn, :index) %></span>
