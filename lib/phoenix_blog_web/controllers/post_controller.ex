@@ -21,7 +21,8 @@ defmodule PhoenixBlogWeb.PostController do
   end
 
   def index(conn, _params) do
-    posts = Content.list_posts()
+    posts = Post |> Post.count_comments |> Repo.all
+#      Content.list_posts() |> Enum.map(Post.count_comments())
     render(conn, "index.html", posts: posts)
   end
 
@@ -70,7 +71,7 @@ defmodule PhoenixBlogWeb.PostController do
   end
 
   def delete(conn, %{"id" => id}) do
-    post = Content.get_post!(id)
+    post = Content.get_post!(id) |> Repo.preload([:comments])
     {:ok, _post} = Content.delete_post(post)
 
     conn
