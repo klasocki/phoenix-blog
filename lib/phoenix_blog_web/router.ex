@@ -21,9 +21,4 @@ defmodule PhoenixBlogWeb.Router do
       post "/comment", PostController, :add_comment
     end
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", PhoenixBlogWeb do
-  #   pipe_through :api
-  # end
 end
